@@ -1,20 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-import { View, Text, TextInput, StyleSheet, Platform } from 'react-native';
+import {
+    View,
+    FlatList,
+    Text,
+    TextInput,
+    StyleSheet,
+    Platform,
+} from 'react-native';
 import { Button } from '../components/Button';
 import { SkillCard } from '../components/SkillCard';
 
 export function Home() {
     const [newSkill, setNewSkill] = useState('');
     const [mySkills, setMySkills] = useState([]);
+    const [greeting, setGreeting] = useState('');
 
     function handleAddNewSkill() {
         setMySkills([...mySkills, newSkill]);
     }
 
+    useEffect(() => {
+        const currentHour = new Date().getHours();
+
+        if (currentHour >= 0 && currentHour < 12) {
+            setGreeting('Good Morning!');
+        } else if (currentHour >= 12 && currentHour < 18) {
+            setGreeting('Good Afternoon!');
+        } else if (currentHour >= 18 && currentHour < 24) {
+            setGreeting('Good Night!');
+        }
+    }, []);
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Welcome, Murilo</Text>
+            <Text style={styles.greetings}>{greeting}</Text>
 
             <TextInput
                 style={styles.input}
@@ -25,13 +46,13 @@ export function Home() {
 
             <Button onPress={handleAddNewSkill} />
 
-            <Text style={[styles.title, { marginVertical: 50 }]}>
-                My Skills
-            </Text>
+            <Text style={[styles.title, { marginVertical: 50 }]}>MySkills</Text>
 
-            {mySkills.map((skill, index) => (
-                <SkillCard key={index} skill={skill} />
-            ))}
+            <FlatList
+                data={mySkills}
+                keyExtractor={item => item}
+                renderItem={({ item }) => <SkillCard skill={item} />}
+            />
         </View>
     );
 }
@@ -55,5 +76,8 @@ const styles = StyleSheet.create({
         padding: Platform.OS === 'ios' ? 15 : 10,
         marginTop: 30,
         borderRadius: 7,
+    },
+    greetings: {
+        color: '#fff',
     },
 });
